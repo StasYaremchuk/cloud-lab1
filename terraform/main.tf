@@ -16,7 +16,7 @@ resource "google_sql_database_instance" "db" {
     tier = "db-f1-micro" # Найдешевший і найпростіший тариф
   }
 
-  deletion_protection = false # Дозволяємо видалення через terraform destroy
+  deletion_protection = false
 }
 
 # 3. Користувач для бази даних
@@ -26,7 +26,7 @@ resource "google_sql_user" "db_user" {
   password = var.db_password
 }
 
-# 4. База даних (наприклад, planesdb)
+# 4. База даних
 resource "google_sql_database" "database" {
   name     = "planesdb"
   instance = google_sql_database_instance.db.name
@@ -45,29 +45,26 @@ resource "google_project_iam_member" "cloud_sql_client" {
   member  = "serviceAccount:${google_service_account.cloud_run_sa.email}"
 }
 
-# 7. Сервіс Cloud Run, який запускає наш контейнер
+# 7. Сервіс Cloud Run
 resource "google_cloud_run_v2_service" "app" {
   name     = "cloud-lab1-app"
   location = var.region
-
   template {
     service_account = google_service_account.cloud_run_sa.email
-
     containers {
-      # Образ з нашого Artifact Registry
       image = "${var.region}-docker.pkg.dev/${var.project_id}/${google_artifact_registry_repository.repo.repository_id}/cloud-lab1-app:latest"
 
       env {
         name  = "DATABASE_URL"
         value = "postgres://appuser:${var.db_password}@localhost/planesdb?host=/cloudsql/${google_sql_database_instance.db.connection_name}"
       }
-      env {
-        name  = "PORT"
-        value = "3000"
+
+      volume_mounts {
+        name       = "cloudsql"
+        mount_path = "/cloudsql"
       }
     }
 
-    # Підключення Cloud SQL через вбудований механізм Cloud Run
     volumes {
       name = "cloudsql"
       cloud_sql_instance {
@@ -76,7 +73,6 @@ resource "google_cloud_run_v2_service" "app" {
     }
   }
 }
-
 # 8. Дозволяємо публічний доступ до нашого сервісу
 resource "google_cloud_run_v2_service_iam_member" "public_access" {
   location = google_cloud_run_v2_service.app.location
