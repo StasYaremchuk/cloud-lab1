@@ -101,7 +101,7 @@ app.delete("/planes/:id", async (req, res) => {
   }
 });
 
-// Health check (знадобиться для ALB в завданні 4)
+// Health check
 app.get("/health", (req, res) => {
   res.json({ status: "ok" });
 });
