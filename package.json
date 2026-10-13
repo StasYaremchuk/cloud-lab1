@@ -1,0 +1,14 @@
+{
+  "name": "cloud-lab1",
+  "version": "1.0.0",
+  "description": "REST API for planes with PostgreSQL",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "pg": "^8.13.1"
+  }
+}

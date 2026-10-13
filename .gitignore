@@ -1,0 +1,13 @@
+.vscode/
+
+# Node.js
+node_modules/
+npm-debug.log*
+.env
+# Terraform
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+*.tfvars
+crash.log
