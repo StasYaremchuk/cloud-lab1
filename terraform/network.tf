@@ -43,7 +43,7 @@ resource "google_vpc_access_connector" "connector" {
   depends_on = [google_service_networking_connection.private_vpc_connection]
 }
 
-# 6. Firewall rule: дозволяємо PostgreSQL тільки з connector'а
+# 6. Firewall rule: дозволяємо PostgreSQL тільки з connector
 resource "google_compute_firewall" "allow_cloudsql_from_connector" {
   name    = "cloud-lab1-allow-postgres-from-connector"
   network = google_compute_network.vpc.name

@@ -10,7 +10,7 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
-// GET /planes — список з пошуком і сортуванням
+// GET /planes
 app.get("/planes", async (req, res) => {
   try {
     let sql = "SELECT * FROM planes";
@@ -49,7 +49,7 @@ app.get("/planes", async (req, res) => {
   }
 });
 
-// POST /planes — створити
+// POST /planes
 app.post("/planes", async (req, res) => {
   try {
     const { name, fuelCapacity, passengers } = req.body;
@@ -64,7 +64,7 @@ app.post("/planes", async (req, res) => {
   }
 });
 
-// PUT /planes/:id — оновити
+// PUT /planes/:id
 app.put("/planes/:id", async (req, res) => {
   try {
     const id = parseInt(req.params.id);
@@ -83,7 +83,7 @@ app.put("/planes/:id", async (req, res) => {
   }
 });
 
-// DELETE /planes/:id — видалити
+// DELETE /planes/:id 
 app.delete("/planes/:id", async (req, res) => {
   try {
     const id = parseInt(req.params.id);
@@ -105,6 +105,8 @@ app.delete("/planes/:id", async (req, res) => {
 app.get("/health", (req, res) => {
   res.json({ status: "ok" });
 });
-
+app.get("/version", (req, res) => {
+  res.json({ version: "2.0", deployedBy: "GitHub Actions" });
+});
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
