@@ -1,6 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 const { Pool } = require("pg");
+const swaggerUi = require("swagger-ui-express");
+const swaggerDocument = require("./swagger.json");
 
 const app = express();
 app.use(cors());
@@ -108,5 +110,6 @@ app.get("/health", (req, res) => {
 app.get("/version", (req, res) => {
   res.json({ version: "2.0", deployedBy: "GitHub Actions" });
 });
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

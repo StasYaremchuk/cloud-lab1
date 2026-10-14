@@ -1,0 +1,127 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Cloud Lab1 — Planes API",
+    "version": "2.0.0",
+    "description": "REST API для управління літаками (лабораторна робота №1)"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Local"
+    },
+    {
+      "url": "http://8.233.185.196",
+      "description": "GCP Load Balancer"
+    }
+  ],
+  "paths": {
+    "/planes": {
+      "get": {
+        "summary": "Отримати список літаків",
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "Пошук за назвою"
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": { "type": "string", "enum": ["passengers"] },
+            "description": "Сортування за кількістю пасажирів"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Список літаків" }
+        }
+      },
+      "post": {
+        "summary": "Створити літак",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name", "fuelCapacity", "passengers"],
+                "properties": {
+                  "name": { "type": "string", "example": "Cessna 172" },
+                  "fuelCapacity": { "type": "integer", "example": 212 },
+                  "passengers": { "type": "integer", "example": 4 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Створено" }
+        }
+      }
+    },
+    "/planes/{id}": {
+      "put": {
+        "summary": "Оновити літак",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "fuelCapacity": { "type": "integer" },
+                  "passengers": { "type": "integer" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Оновлено" },
+          "404": { "description": "Не знайдено" }
+        }
+      },
+      "delete": {
+        "summary": "Видалити літак",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Видалено" },
+          "404": { "description": "Не знайдено" }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "summary": "Health check",
+        "responses": {
+          "200": { "description": "OK" }
+        }
+      }
+    },
+    "/version": {
+      "get": {
+        "summary": "Версія застосунку",
+        "responses": {
+          "200": { "description": "Version info" }
+        }
+      }
+    }
+  }
+}

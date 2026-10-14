@@ -5,7 +5,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install --omit=dev && npm cache clean --force
 
-COPY server.js ./
+COPY server.js swagger.json ./
 
 RUN addgroup -S app && adduser -S app -G app
 USER app
