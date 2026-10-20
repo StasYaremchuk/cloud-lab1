@@ -3,7 +3,7 @@ resource "google_compute_global_address" "lb_ip" {
   name = "cloud-lab1-lb-ip"
 }
 
-# 2. Serverless NEG — вказує на Cloud Run
+# 2. Serverless NEG
 resource "google_compute_region_network_endpoint_group" "cloud_run_neg" {
   name                  = "cloud-lab1-neg"
   network_endpoint_type = "SERVERLESS"
@@ -51,7 +51,7 @@ resource "google_compute_target_http_proxy" "http_proxy" {
   url_map = google_compute_url_map.url_map.id
 }
 
-# 7. Global Forwarding Rule (frontend)
+# 7. Global Forwarding Rule
 resource "google_compute_global_forwarding_rule" "forwarding_rule" {
   name       = "cloud-lab1-forwarding-rule"
   target     = google_compute_target_http_proxy.http_proxy.id

@@ -6,7 +6,7 @@ resource "google_artifact_registry_repository" "repo" {
   description   = "Docker repository for cloud-lab1"
 }
 
-# 2. Інстанс Cloud SQL (Postgres) — тільки приватний IP
+# 2. Інстанс Cloud SQL (Postgres) 
 resource "google_sql_database_instance" "db" {
   name             = "cloud-lab1-db"
   database_version = "POSTGRES_15"
@@ -60,7 +60,6 @@ resource "google_cloud_run_v2_service" "app" {
   template {
     service_account = google_service_account.cloud_run_sa.email
 
-    # Підключення до VPC через connector (для private IP Cloud SQL)
     vpc_access {
       connector = google_vpc_access_connector.connector.id
       egress    = "PRIVATE_RANGES_ONLY"

@@ -1,4 +1,4 @@
-# 1. Кастомний VPC (не Default VPC — вимога методички)
+# 1. Кастомний VPC
 resource "google_compute_network" "vpc" {
   name                    = "cloud-lab1-vpc"
   auto_create_subnetworks = false
@@ -24,7 +24,7 @@ resource "google_compute_global_address" "private_ip_range" {
   network       = google_compute_network.vpc.id
 }
 
-# 4. Приватне з'єднання з Google (для Cloud SQL private IP)
+# 4. Приватне з'єднання з Google 
 resource "google_service_networking_connection" "private_vpc_connection" {
   network                 = google_compute_network.vpc.id
   service                 = "servicenetworking.googleapis.com"
@@ -33,7 +33,7 @@ resource "google_service_networking_connection" "private_vpc_connection" {
   deletion_policy = "ABANDON"
 }
 
-# 5. Serverless VPC Access Connector (щоб Cloud Run бачив VPC)
+# 5. Serverless VPC Access Connector
 resource "google_vpc_access_connector" "connector" {
   name          = "cloud-lab1-connector"
   region        = var.region
@@ -43,7 +43,7 @@ resource "google_vpc_access_connector" "connector" {
   depends_on = [google_service_networking_connection.private_vpc_connection]
 }
 
-# 6. Firewall rule: дозволяємо PostgreSQL тільки з connector
+# 6. Firewall rule
 resource "google_compute_firewall" "allow_cloudsql_from_connector" {
   name    = "cloud-lab1-allow-postgres-from-connector"
   network = google_compute_network.vpc.name
@@ -53,7 +53,7 @@ resource "google_compute_firewall" "allow_cloudsql_from_connector" {
     ports    = ["5432"]
   }
 
-  source_ranges = ["10.10.0.0/28"]  # тільки з VPC connector
+  source_ranges = ["10.10.0.0/28"]
   target_tags   = ["cloud-sql"]
 
   direction = "INGRESS"
