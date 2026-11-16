@@ -21,11 +21,19 @@ services:
     environment:
       DATABASE_URL: postgres://appuser:apppassword@db:5432/planesdb
       PORT: 3000
+      REDIS_URL: redis://redis:6379
     ports:
       - "3000:3000"
     depends_on:
       db:
         condition: service_healthy
+    networks:
+      - backend
+  
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
     networks:
       - backend
 

@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const { Pool } = require("pg");
+const { createClient } = require("redis");
 const swaggerUi = require("swagger-ui-express");
 const swaggerDocument = require("./swagger.json");
 
@@ -12,9 +13,26 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
+const redisClient = createClient({
+  url: process.env.REDIS_URL || 'redis://localhost:6379'
+});
+redisClient.on('error', (err) => console.log('Redis Client Error', err));
+redisClient.connect();
+
 // GET /planes
 app.get("/planes", async (req, res) => {
   try {
+    const hasFilters = req.query.search || req.query.sort === "passengers";
+    if (!hasFilters) {
+      const cachedData = await redisClient.get('planes_list');
+      if (cachedData) {
+        console.log('CACHE HIT');
+        return res.json(JSON.parse(cachedData));
+      }
+    }
+    console.log('CACHE MISS');
+
+
     let sql = "SELECT * FROM planes";
     const params = [];
     const conditions = [];
@@ -40,6 +58,15 @@ app.get("/planes", async (req, res) => {
       0
     );
 
+    const responseData = {
+      total: result.rows.length,
+      totalPassengers,
+      data: result.rows,
+    };
+
+    if (!hasFilters) {
+      await redisClient.setEx('planes_list', 30, JSON.stringify(responseData));
+    }
     res.json({
       total: result.rows.length,
       totalPassengers,
@@ -59,6 +86,9 @@ app.post("/planes", async (req, res) => {
       "INSERT INTO planes (name, fuel_capacity, passengers) VALUES ($1, $2, $3) RETURNING *",
       [name, fuelCapacity, passengers]
     );
+
+    await redisClient.del('planes_list');
+
     res.status(201).json(result.rows[0]);
   } catch (err) {
     console.error(err);
@@ -78,6 +108,9 @@ app.put("/planes/:id", async (req, res) => {
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "Not found" });
     }
+
+    await redisClient.del('planes_list');
+
     res.json(result.rows[0]);
   } catch (err) {
     console.error(err);
@@ -96,6 +129,9 @@ app.delete("/planes/:id", async (req, res) => {
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "Not found" });
     }
+
+    await redisClient.del('planes_list');
+
     res.json({ success: true, deleted: result.rows[0] });
   } catch (err) {
     console.error(err);

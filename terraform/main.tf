@@ -60,6 +60,11 @@ resource "google_cloud_run_v2_service" "app" {
   template {
     service_account = google_service_account.cloud_run_sa.email
 
+    scaling {
+      min_instance_count = 1
+      max_instance_count = 4
+    }
+
     vpc_access {
       connector = google_vpc_access_connector.connector.id
       egress    = "PRIVATE_RANGES_ONLY"
@@ -71,6 +76,10 @@ resource "google_cloud_run_v2_service" "app" {
       env {
         name  = "DATABASE_URL"
         value = "postgres://appuser:${var.db_password}@${google_sql_database_instance.db.private_ip_address}:5432/planesdb"
+      }
+      env {
+        name  = "REDIS_URL"
+        value = "redis://${google_redis_instance.cache.host}:${google_redis_instance.cache.port}"
       }
     }
   }
