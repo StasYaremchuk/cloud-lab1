@@ -61,7 +61,7 @@ resource "google_cloud_run_v2_service" "app" {
     service_account = google_service_account.cloud_run_sa.email
 
     scaling {
-      min_instance_count = 1
+      min_instance_count = var.is_night ? 0 : 2
       max_instance_count = 4
     }
 

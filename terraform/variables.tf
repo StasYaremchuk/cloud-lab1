@@ -15,3 +15,9 @@ variable "db_password" {
   type        = string
   sensitive   = true 
 }
+
+variable "is_night" {
+  description = "Toggle for day/night scaling"
+  type        = bool
+  default     = false
+}
