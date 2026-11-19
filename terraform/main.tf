@@ -58,6 +58,7 @@ resource "google_cloud_run_v2_service" "app" {
   location = var.region
 
   template {
+    max_instance_request_concurrency = 5
     service_account = google_service_account.cloud_run_sa.email
 
     scaling {

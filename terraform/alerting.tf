@@ -6,17 +6,17 @@ resource "google_monitoring_notification_channel" "email_channel" {
   }
 }
 
-resource "google_monitoring_alert_policy" "high_cpu_alert" {
-  display_name = "High CPU Utilization Alert"
+resource "google_monitoring_alert_policy" "high_latency_alert" {
+  display_name = "High Latency Alert (p95 > 500ms)"
   combiner     = "OR"
   
   conditions {
-    display_name = "CPU > 40%"
+    display_name = "Latency p95 > 500ms"
     condition_threshold {
-      filter          = "metric.type=\"run.googleapis.com/container/cpu/utilizations\" resource.type=\"cloud_run_revision\" resource.label.\"service_name\"=\"cloud-lab1-app\""
-      duration        = "120s"
+      filter          = "metric.type=\"run.googleapis.com/request_latencies\" resource.type=\"cloud_run_revision\" resource.label.\"service_name\"=\"cloud-lab1-app\""
+      duration        = "120s" 
       comparison      = "COMPARISON_GT"
-      threshold_value = 0.4
+      threshold_value = 0.5 
       
       trigger {
         count = 1
